@@ -6,7 +6,6 @@ Running notes on what was skipped / simplified in the first proof-of-concept pas
 
 - **`localStorage` instead of Dexie/IndexedDB.** Single JSON blob under key `zoo_keeper_data_v1`. Fine for ~hundreds of cards; will choke on large completion histories. Swap for Dexie when we actually care about durability and incremental writes.
 - **No PWA.** No `vite-plugin-pwa`, no manifest, no service worker, no `navigator.storage.persist()`. Runs as a plain web app. Install to home screen is not supported. Add these before the app is actually useful on a phone.
-- **No tests.** The domain engine is framework-free and the clean split is there to make tests easy to add, but no test runner is wired up yet. `engine.ts` is the obvious first target.
 
 ## Features skipped from the core loop
 

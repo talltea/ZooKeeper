@@ -11,7 +11,6 @@ Without this, nothing else matters: data can vanish, nobody installs it, and reg
 - **PWA shell.** `vite-plugin-pwa`, manifest, service worker, `navigator.storage.persist()`, install-to-home-screen nudge.
 - **Dexie migration.** Move the single-blob `localStorage['zoo_keeper_data_v1']` to IndexedDB with a schema version.
 - **Export / import.** JSON round-trip with confirm-replace dialog per DESIGN.md.
-- **Domain engine tests.** `src/domain/*` is framework-free; wire up Vitest and cover filter → weight → sample.
 
 ## 2. Custom life modeling — the core promise
 
@@ -70,4 +69,3 @@ The roguelike layer. Default experience per design decision 2026-04-21, not hidd
 
 - Game mode (6) assumes Dexie (1) — energy points and relics grow tables that `localStorage` won't handle well.
 - Modes (4) and Pause (3) both want Dexie for clean indexed queries, though they'd work on top of `localStorage`.
-- Everything after Foundation (1) benefits from tests (1); slipping tests means paying interest later.
