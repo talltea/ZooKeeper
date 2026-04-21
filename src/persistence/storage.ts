@@ -15,6 +15,7 @@ export function loadData(): AppData {
     if (!parsed.usage_days) parsed.usage_days = [];
     if (!parsed.card_states) parsed.card_states = {};
     if (!parsed.sessions) parsed.sessions = [];
+    if (parsed.archetype_id === undefined) parsed.archetype_id = null;
     return parsed;
   } catch (e) {
     console.error('Failed to load data, reseeding', e);

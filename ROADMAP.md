@@ -50,7 +50,7 @@ Scales the app to more users (templates) and gives ambient progress signal (hist
 
 The roguelike layer. Default experience per design decision 2026-04-21, not hidden behind a toggle. Lighter pieces first so archetypes can ship before relics land.
 
-- **Archetypes** — onboarding picker, weight deltas in engine, switchable. Ship 5–6 archetypes initially.
+- ~~**Archetypes** — onboarding picker, weight deltas in engine, switchable. Ship 5–6 archetypes initially.~~ Shipped: Generalist / Hermit / Nester / Explorer / Minimalist / Recovering. Weights bias by seeded deck id, energy, context, time-of-day, and short-duration; Minimalist overrides hand size. See [POC_NOTES.md](./POC_NOTES.md#archetype-limitations).
 - **Energy-point streak** — replace the simple opened-and-drew streak with the 3-points-max / 1-point-decay model from DESIGN.md open question 4.
 - **Relics** — data model, earn conditions, weighting hooks.
 - **Rarity rewards** — bonus on epic/rare card completion.

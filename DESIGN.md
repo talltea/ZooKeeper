@@ -233,6 +233,8 @@ Illustrative set:
 
 Archetypes are *weights and flavor*, not restrictions. No content is locked behind them.
 
+**Initial release ships six of the illustrative archetypes above:** Generalist (no-bias baseline), Hermit, Nester, Explorer, Minimalist, and Recovering. The rest require content shape that isn't modeled yet — social sub-tags, dependent-facing decks, seasonal rhythms, or a user-designated practice deck — and are deferred until those land.
+
 ### Other mechanics on the table
 
 - **Relics** — passive modifiers earned from streaks or completions (e.g. "+1 hand size on Sunday", "Fun deck weight ×1.5 this week").

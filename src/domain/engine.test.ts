@@ -200,6 +200,7 @@ describe('draw', () => {
       card_states: {},
       sessions: [],
       usage_days: [],
+      archetype_id: null,
     };
     const result = draw(data, { deck_ids: null }, 3, NOW, seq(0));
     expect(result.pool_size).toBe(1);
@@ -216,9 +217,28 @@ describe('draw', () => {
       card_states: {},
       sessions: [],
       usage_days: [],
+      archetype_id: null,
     };
     const result = draw(data, { deck_ids: null, context: 'home' }, 3, NOW, seq(0));
     expect(result.cards.map((c) => c.id)).toEqual(['h']);
+  });
+
+  it('applies weightMultiplier on top of cardWeight when provided', () => {
+    // Both cards equally overdue; multiplier zeroes out one of them so the other is always picked.
+    const a = makeCard({ id: 'a' });
+    const b = makeCard({ id: 'b' });
+    const data: AppData = {
+      decks: [deck],
+      cards: [a, b],
+      completions: [completion('a', 21), completion('b', 21)],
+      card_states: {},
+      sessions: [],
+      usage_days: [],
+      archetype_id: null,
+    };
+    const multiplier = (c: Card) => (c.id === 'a' ? 1 : 0);
+    const result = draw(data, { deck_ids: null }, 1, NOW, seq(0.5), multiplier);
+    expect(result.cards.map((c) => c.id)).toEqual(['a']);
   });
 });
 

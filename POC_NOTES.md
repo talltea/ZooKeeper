@@ -44,6 +44,14 @@ Running notes on what was skipped / simplified in the first proof-of-concept pas
 - No deck CRUD. Decks are seeded on first run and cannot be renamed, recolored, added, or removed from the UI.
 - Reset button not exposed; to wipe data, clear `localStorage['zoo_keeper_data_v1']` in devtools.
 
+## Archetype limitations
+
+- Six archetypes shipped (Generalist, Hermit, Nester, Explorer, Minimalist, Recovering). Onboarding picker overlays the app when `archetype_id` is `null`; header chip re-opens the picker.
+- Archetype deck boosts reference **seeded deck ids** (`deck_upkeep`, `deck_self`, `deck_deep`, `deck_fun`). User-created decks don't get boosted by any archetype until decks gain a tag/category field. Energy, context, time-of-day, and short-duration boosts work for any card regardless of deck origin.
+- Archetype weight hook tuning knobs (1.3x–2x) are guesses; no tuning pass.
+- Archetypes from DESIGN.md not yet shipped: Socialite, Caretaker, Gardener, Night Owl/Early Bird, Apprentice. These depend on content that's not modeled yet (social sub-tags, dependent decks, seasonal rhythms, practice decks).
+- Relics, rarity rewards, and commit-draws from the same DESIGN section are still pending — archetypes stand alone for now.
+
 ## Things I did keep honest
 
 - Domain engine is framework-free (`src/domain/*`), no Svelte or storage imports — directly unit-testable when we add a runner.

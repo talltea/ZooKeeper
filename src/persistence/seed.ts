@@ -129,5 +129,6 @@ export function seedData(): AppData {
     card_states: {},
     sessions: [],
     usage_days: [],
+    archetype_id: null,
   };
 }

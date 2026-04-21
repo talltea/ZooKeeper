@@ -57,4 +57,5 @@ export interface AppData {
   card_states: Record<string, CardState>;
   sessions: DrawSession[];
   usage_days: string[];
+  archetype_id: string | null;
 }

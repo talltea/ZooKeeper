@@ -98,9 +98,13 @@ export function draw(
   handSize: number,
   now: number,
   rng: () => number = Math.random,
+  weightMultiplier?: (card: Card) => number,
 ): DrawResult {
   const pool = filterCards(data.cards, data.card_states, filters, now);
-  const weights = pool.map((c) => cardWeight(c, data.completions, now));
+  const weights = pool.map((c) => {
+    const base = cardWeight(c, data.completions, now);
+    return weightMultiplier ? base * weightMultiplier(c) : base;
+  });
   const drawable = pool.filter((_, i) => weights[i] > 0);
   const drawableWeights = weights.filter((w) => w > 0);
   const cards = weightedSampleWithoutReplacement(drawable, drawableWeights, handSize, rng);

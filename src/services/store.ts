@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 import type { AppData, Card, DrawFilters, DrawSession } from '../domain/types';
 import { loadData, saveData, uid } from '../persistence/storage';
 import { dayKey, draw as engineDraw } from '../domain/engine';
+import { archetypeMultiplier, getArchetype } from '../domain/archetypes';
 
 export const data = writable<AppData>(loadData());
 
@@ -22,7 +23,10 @@ export function markUsageToday(): void {
 export function createDraw(filters: DrawFilters, handSize = 3): { session: DrawSession; cards: Card[]; poolSize: number } {
   markUsageToday();
   const now = Date.now();
-  const result = engineDraw(current, filters, handSize, now);
+  const archetype = getArchetype(current.archetype_id);
+  const effectiveHand = archetype?.hand_size ?? handSize;
+  const multiplier = archetype ? (c: Card) => archetypeMultiplier(c, archetype) : undefined;
+  const result = engineDraw(current, filters, effectiveHand, now, Math.random, multiplier);
   const session: DrawSession = {
     id: uid(),
     started_at: now,
@@ -32,6 +36,10 @@ export function createDraw(filters: DrawFilters, handSize = 3): { session: DrawS
   };
   commit({ ...current, sessions: [...current.sessions, session] });
   return { session, cards: result.cards, poolSize: result.pool_size };
+}
+
+export function setArchetype(id: string | null): void {
+  commit({ ...current, archetype_id: id });
 }
 
 export function completeCard(cardId: string, sessionId?: string): void {
