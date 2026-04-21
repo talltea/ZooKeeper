@@ -1,7 +1,7 @@
 import type { AppData } from '../domain/types';
 import { seedData } from './seed';
 
-const KEY = 'zoo_keeper_data_v1';
+const KEY = 'zoo_keeper_data_v2';
 
 export function loadData(): AppData {
   try {

@@ -32,6 +32,27 @@ The Fun deck sits alongside the others with the same mechanics — no gating, no
 
 The app ships with the starter decks above pre-populated with a handful of example cards each. Users can edit, remove, or ignore them.
 
+### User decks
+
+Decks are not a fixed set. A big part of the app's value is letting users add the decks that match the actual shape of their life — the chores and commitments a generic template can't predict. Examples of decks users might add:
+
+- **Pets** — feed, walk, vet reminders, litter box, medication
+- **Garden** — water, weed, prune, seasonal prep, harvest
+- **Kids** — school forms, practice pickup, snack prep, bedtime routine
+- **Household** (roommates / partner) — shared chores, coordination cards
+- **Work** — recurring admin that isn't personal (weekly report, 1:1 prep)
+- **Hobby / practice** — instrument, language, craft, training plan
+- **Health** — medication, PT exercises, appointment follow-ups
+- **Relationships** — call parents, text a friend, date-night prep
+
+These aren't gated behind a starter selection. Users create and name decks freely, pick an icon/color, and add cards to them. The starter decks are opinionated defaults, not a required structure.
+
+### Deck templates
+
+To lower cold-start cost, the app offers optional **deck templates**: a deck plus a handful of example cards with sensible defaults. Examples: "Dog owner", "Houseplants", "New parent (0–6 months)", "Renter", "WFH desk worker", "Student", "Caregiver".
+
+Installing a template creates the deck and its example cards in one step; everything is editable afterwards. Templates are *content*, not commitment — picking "Dog owner" doesn't enroll the user in a plan, it just drops a deck with `feed`, `walk`, `vet reminder` cards into their library.
+
 ## Cards
 
 Each card represents a task the user wants to do with some frequency.
@@ -83,11 +104,31 @@ Never-completed cards are treated as if `last_completed = created_at`, so they p
 
 Weighted random without replacement; default hand size N = 3.
 
+## Modes (saved draw presets)
+
+A **Mode** is a named bundle of filters the user can apply in one tap instead of reconfiguring decks / energy / time / context each time they draw. Users save their own; the app ships a few:
+
+- **Fun mode.** Draws only from Self-care and Side quests (Fun). For when the user wants the app to stop being a task engine and start being a source of delight. Weighting still applies — the most-neglected-fun card tends to surface, so "you haven't called your brother in three weeks" earns its place alongside lighter cards.
+- **Quick reset.** Low energy, duration ≤ 10 minutes, context = home. For "I have ten minutes before I have to leave."
+- **Morning mode / evening mode.** Whatever the user typically does at those times — configured once, reused daily.
+- **Low-spoons mode.** Low-energy cap, short duration, excludes decks the user tags as demanding (e.g. Deep clean, Work).
+
+A Mode is `(name, icon, deck selection, energy cap, duration cap, time-of-day override, context tags)`. No new weighting logic — Modes are saved filter sets reusing the filter pipeline defined above. Users edit or delete Modes like any other first-class object.
+
 ## Skip / snooze / retire
 
 - **Pass.** Card goes back, weight unchanged. No punishment.
 - **Snooze.** User picks N days; card is filtered out and its weight does not climb during the snooze window.
 - **Retire.** Card leaves rotation until explicitly revived. For "not for me right now" without deleting setup.
+
+### Pausing a deck or the whole app
+
+Snoozing a single card already exists. Users also need to pause larger units:
+
+- **Deck pause.** Freeze an entire deck — cards in it stop being drawn, and overdue ratios stop climbing while paused. For seasonal decks (Garden in winter), context shifts (Work deck during sabbatical), or temporary life changes.
+- **App pause ("vacation mode").** Freeze everything. Overdue ratios hold, streak doesn't break, the draw screen is replaced with a "you're on pause" affordance. For vacations, illness, life crises, or a genuinely rough week. Returning from pause should feel like picking up where you left off, not coming back to an avalanche of overdue cards.
+
+Both pauses are indefinite by default, with an optional "remind me in N days" nudge (not a hard resume). Pausing is a first-class action with the same design energy as "skipping is free": if the app's first reaction to a bad month is a guilt-free pause, that's the right reaction.
 
 ## Streaks and satisfaction
 
@@ -169,6 +210,45 @@ Pure-core / thin-shell split — engine is framework-free and unit-testable.
 2. **Persistence** — Dexie wrapper, schema migrations, export/import serialization.
 3. **App services** — draw session orchestration, completion handling, streak tracker.
 4. **UI (Svelte)** — deck/card management, draw flow, completion screens, history, settings (including export/import).
+
+## Post-v1 direction: archetypes and meta-progression
+
+Early rounds of this doc held hard on "reward showing up, not performing." That line has softened — completion-driven progression is on the table, provided it doesn't turn the app into a nag. What follows is illustrative direction, not v1 commitment.
+
+### Archetypes
+
+An **archetype** is a bundle of draw-weighting tweaks, a starting relic pool (if relics ship), and a bit of flavor. Users pick one (or none) at onboarding; switching is free and non-destructive.
+
+Illustrative set:
+- **The Hermit.** Self-care and Upkeep weighted; low-energy cards boosted; Fun deck biased toward solo options.
+- **The Socialite.** Fun deck biased toward social cards; relationship cards surface more often.
+- **The Nester.** Home context boosted; Upkeep and Deep clean weighted; errand cards quieter.
+- **The Explorer.** Out and errand contexts boosted; Fun side quests biased toward novelty.
+- **The Caretaker.** Pet, Kids, Garden, and other dependent-facing decks weighted; "someone else depends on this" cards surface first.
+- **The Gardener.** Literal — Garden deck weighted, with seasonal rhythms baked in (different weights by month).
+- **The Night Owl / The Early Bird.** Time-of-day weighting biased toward the user's real peak hours.
+- **The Apprentice.** Weights a user-defined practice deck (instrument, language, craft) heavily; relic pool favors streak-stacking.
+- **The Minimalist.** Narrower draws (hand size 2), sharper focus.
+- **The Recovering.** Generous weighting, soft failure, relic pool tilted toward comfort. For low-energy seasons — post-illness, postpartum, depression, grief. Explicitly safe to pick and stay on; the app should never shame a user for choosing the easy path.
+
+Archetypes are *weights and flavor*, not restrictions. No content is locked behind them.
+
+### Other mechanics on the table
+
+- **Relics** — passive modifiers earned from streaks or completions (e.g. "+1 hand size on Sunday", "Fun deck weight ×1.5 this week").
+- **Rarity rewards** — completing a very overdue ("epic") card grants a bonus; the fresh/ready/rare/epic tiers get teeth beyond cosmetic framing.
+- **Risk/reward commits** — opt-in "draw 5, commit to 2 by end of day" alongside the no-stakes default draw.
+- **Weekly boss floor** — curated cluster (often Deep clean) with a meaningful completion reward.
+
+Modes (including Fun mode) are v1 — they're just saved filter presets and don't require any of the above.
+
+### Deck thinning is out
+
+Slay-the-Spire-style deck thinning — rewarding the user for retiring cards — is **not** the direction. Retire and delete stay as neutral cleanup actions, not a progression lever. The app's library should feel like a growing reflection of the user's life, not a thing to aggressively prune for optimization.
+
+### Game mode is the default
+
+Archetypes, relics, rarity rewards, and commit-draws are the default experience, not hidden behind a "Game mode" toggle. Onboarding picks an archetype (including a safe "Recovering" option that feels minimal and forgiving) and the roguelike layer sits on top of the default draw loop. Users who want a pure chore nudger can pick a minimal archetype, skip commit-draws (opt-in per draw), and ignore relics they earn — the draw itself still works as a plain suggestion engine.
 
 ## Out of scope for v1
 
