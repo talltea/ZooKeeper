@@ -1,10 +1,17 @@
 import { writable } from 'svelte/store';
-import type { AppData, Card, DrawFilters, DrawSession } from '../domain/types';
+import type { AppData, Card, DrawFilters, DrawSession, Relic } from '../domain/types';
 import { loadData, saveData, uid } from '../persistence/storage';
-import { dayKey, draw as engineDraw } from '../domain/engine';
+import { dayKey, draw as engineDraw, overdueRatio } from '../domain/engine';
 import { archetypeMultiplier, getArchetype } from '../domain/archetypes';
+import {
+  checkRelicEarns,
+  relicsHandSizeDelta,
+  relicsMultiplier,
+  type RelicContext,
+} from '../domain/relics';
 
 export const data = writable<AppData>(loadData());
+export const newlyEarnedRelics = writable<Relic[]>([]);
 
 let current: AppData = loadData();
 data.subscribe((v) => { current = v; });
@@ -14,19 +21,43 @@ function commit(next: AppData): void {
   data.set(next);
 }
 
+function runEarnChecks(next: AppData, now: number): AppData {
+  const newlyEarned = checkRelicEarns(next, now);
+  if (newlyEarned.length === 0) return next;
+  newlyEarnedRelics.update((prev) => [...prev, ...newlyEarned]);
+  return { ...next, relics: [...next.relics, ...newlyEarned] };
+}
+
 export function markUsageToday(): void {
   const today = dayKey(Date.now());
   if (current.usage_days.includes(today)) return;
-  commit({ ...current, usage_days: [...current.usage_days, today] });
+  let next: AppData = { ...current, usage_days: [...current.usage_days, today] };
+  next = runEarnChecks(next, Date.now());
+  commit(next);
 }
 
-export function createDraw(filters: DrawFilters, handSize = 3): { session: DrawSession; cards: Card[]; poolSize: number } {
+const BASE_HAND_SIZE = 3;
+
+export function createDraw(filters: DrawFilters, _handSize = BASE_HAND_SIZE): { session: DrawSession; cards: Card[]; poolSize: number } {
   markUsageToday();
   const now = Date.now();
   const archetype = getArchetype(current.archetype_id);
-  const effectiveHand = archetype?.hand_size ?? handSize;
-  const multiplier = archetype ? (c: Card) => archetypeMultiplier(c, archetype) : undefined;
-  const result = engineDraw(current, filters, effectiveHand, now, Math.random, multiplier);
+  const dayOfWeek = new Date(now).getDay();
+  const baseCtx: Omit<RelicContext, 'overdue_ratio'> = { now, day_of_week: dayOfWeek };
+
+  const handSize = archetype?.hand_size
+    ?? (BASE_HAND_SIZE + relicsHandSizeDelta(current.relics, { ...baseCtx, overdue_ratio: 0 }));
+
+  const multiplier = (c: Card): number => {
+    const ratio = overdueRatio(c, current.completions, now);
+    const ctx: RelicContext = { ...baseCtx, overdue_ratio: ratio };
+    let m = 1;
+    if (archetype) m *= archetypeMultiplier(c, archetype);
+    m *= relicsMultiplier(c, current.relics, ctx);
+    return m;
+  };
+
+  const result = engineDraw(current, filters, handSize, now, Math.random, multiplier);
   const session: DrawSession = {
     id: uid(),
     started_at: now,
@@ -34,7 +65,9 @@ export function createDraw(filters: DrawFilters, handSize = 3): { session: DrawS
     cards_offered: result.cards.map((c) => c.id),
     card_chosen_id: null,
   };
-  commit({ ...current, sessions: [...current.sessions, session] });
+  let next: AppData = { ...current, sessions: [...current.sessions, session] };
+  next = runEarnChecks(next, now);
+  commit(next);
   return { session, cards: result.cards, poolSize: result.pool_size };
 }
 
@@ -49,7 +82,9 @@ export function completeCard(cardId: string, sessionId?: string): void {
   if (sessionId) {
     sessions = sessions.map((s) => s.id === sessionId ? { ...s, card_chosen_id: cardId } : s);
   }
-  commit({ ...current, completions: [...current.completions, completion], sessions });
+  let next: AppData = { ...current, completions: [...current.completions, completion], sessions };
+  next = runEarnChecks(next, now);
+  commit(next);
 }
 
 export function snoozeCard(cardId: string, days: number): void {
@@ -92,4 +127,13 @@ export function newCard(deckId: string): Card {
     parent_card_id: null,
     created_at: Date.now(),
   };
+}
+
+export function consumeNewlyEarnedRelics(): Relic[] {
+  let consumed: Relic[] = [];
+  newlyEarnedRelics.update((prev) => {
+    consumed = prev;
+    return [];
+  });
+  return consumed;
 }

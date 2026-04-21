@@ -201,6 +201,7 @@ describe('draw', () => {
       sessions: [],
       usage_days: [],
       archetype_id: null,
+      relics: [],
     };
     const result = draw(data, { deck_ids: null }, 3, NOW, seq(0));
     expect(result.pool_size).toBe(1);
@@ -218,6 +219,7 @@ describe('draw', () => {
       sessions: [],
       usage_days: [],
       archetype_id: null,
+      relics: [],
     };
     const result = draw(data, { deck_ids: null, context: 'home' }, 3, NOW, seq(0));
     expect(result.cards.map((c) => c.id)).toEqual(['h']);
@@ -235,6 +237,7 @@ describe('draw', () => {
       sessions: [],
       usage_days: [],
       archetype_id: null,
+      relics: [],
     };
     const multiplier = (c: Card) => (c.id === 'a' ? 1 : 0);
     const result = draw(data, { deck_ids: null }, 1, NOW, seq(0.5), multiplier);

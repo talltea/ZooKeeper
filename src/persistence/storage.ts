@@ -16,6 +16,7 @@ export function loadData(): AppData {
     if (!parsed.card_states) parsed.card_states = {};
     if (!parsed.sessions) parsed.sessions = [];
     if (parsed.archetype_id === undefined) parsed.archetype_id = null;
+    if (!parsed.relics) parsed.relics = [];
     return parsed;
   } catch (e) {
     console.error('Failed to load data, reseeding', e);

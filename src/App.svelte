@@ -5,16 +5,19 @@
   import DrawView from './components/DrawView.svelte';
   import DecksView from './components/DecksView.svelte';
   import ArchetypePicker from './components/ArchetypePicker.svelte';
+  import RelicsPanel from './components/RelicsPanel.svelte';
 
   type Tab = 'draw' | 'decks';
   let tab: Tab = 'draw';
   let showPicker = false;
+  let showRelics = false;
 
   $: streak = computeStreak($data.usage_days, Date.now());
   $: totalCards = $data.cards.length;
   $: totalCompletions = $data.completions.length;
   $: archetype = getArchetype($data.archetype_id);
   $: needsOnboarding = $data.archetype_id === null;
+  $: relicCount = $data.relics.length;
 </script>
 
 <header>
@@ -31,6 +34,14 @@
       {:else}
         🎲 pick
       {/if}
+    </button>
+    <button
+      class="arch-chip"
+      type="button"
+      on:click={() => showRelics = true}
+      title="Relics earned"
+    >
+      🏺 {relicCount}
     </button>
     <span title="Streak">🔥 {streak}d</span>
     <span title="Cards">🃏 {totalCards}</span>
@@ -57,6 +68,10 @@
     on:close={() => (showPicker = false)}
     on:picked={() => (showPicker = false)}
   />
+{/if}
+
+{#if showRelics}
+  <RelicsPanel on:close={() => (showRelics = false)} />
 {/if}
 
 <style>

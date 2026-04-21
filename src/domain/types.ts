@@ -50,6 +50,12 @@ export interface DrawFilters {
   context?: ContextTag;
 }
 
+export interface Relic {
+  id: string;
+  type_id: string;
+  earned_at: number;
+}
+
 export interface AppData {
   decks: Deck[];
   cards: Card[];
@@ -58,4 +64,5 @@ export interface AppData {
   sessions: DrawSession[];
   usage_days: string[];
   archetype_id: string | null;
+  relics: Relic[];
 }

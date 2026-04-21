@@ -130,5 +130,6 @@ export function seedData(): AppData {
     sessions: [],
     usage_days: [],
     archetype_id: null,
+    relics: [],
   };
 }

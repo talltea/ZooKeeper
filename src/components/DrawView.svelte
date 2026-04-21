@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { data, createDraw, completeCard, snoozeCard } from '../services/store';
+  import { data, createDraw, completeCard, snoozeCard, consumeNewlyEarnedRelics } from '../services/store';
   import { overdueRatio } from '../domain/engine';
+  import { getRelicType } from '../domain/relics';
   import type { Card, Energy, DrawFilters } from '../domain/types';
 
   let selectedDecks: Set<string> = new Set();
@@ -10,6 +11,17 @@
   let sessionId: string | undefined;
   let drewOnce = false;
   let flash: string | null = null;
+  let relicFlash: string | null = null;
+
+  function drainEarnedRelics(): void {
+    const earned = consumeNewlyEarnedRelics();
+    if (earned.length === 0) return;
+    const names = earned
+      .map((r) => getRelicType(r.type_id))
+      .filter((t): t is NonNullable<typeof t> => t !== null)
+      .map((t) => `${t.icon} ${t.name}`);
+    relicFlash = `Relic${earned.length > 1 ? 's' : ''} earned: ${names.join(', ')}`;
+  }
 
   function toggleDeck(id: string): void {
     if (selectedDecks.has(id)) selectedDecks.delete(id);
@@ -28,12 +40,14 @@
     sessionId = res.session.id;
     drewOnce = true;
     flash = null;
+    drainEarnedRelics();
   }
 
   function complete(card: Card): void {
     completeCard(card.id, sessionId);
     hand = hand.filter((c) => c.id !== card.id);
     flash = `Nice — marked "${card.title}" done ✓`;
+    drainEarnedRelics();
   }
 
   function snooze(card: Card, days: number): void {
@@ -96,6 +110,13 @@
 <div class="draw-btn-wrap">
   <button class="primary draw-btn" on:click={doDraw}>🎴 Draw</button>
 </div>
+
+{#if relicFlash}
+  <div class="flash relic-flash">
+    <span>🏺 {relicFlash}</span>
+    <button class="dismiss" type="button" aria-label="Dismiss" on:click={() => (relicFlash = null)}>×</button>
+  </div>
+{/if}
 
 {#if flash}
   <div class="flash">{flash}</div>
@@ -171,6 +192,22 @@
     border-radius: 8px;
     margin-bottom: 1rem;
     font-weight: 500;
+  }
+  .relic-flash {
+    background: var(--accent);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .relic-flash .dismiss {
+    background: transparent;
+    border: none;
+    color: var(--on-chip);
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 0 0.3rem;
+    cursor: pointer;
   }
 
   .empty { color: var(--text-muted); text-align: center; padding: 2rem; }

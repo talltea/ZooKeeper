@@ -50,7 +50,16 @@ Running notes on what was skipped / simplified in the first proof-of-concept pas
 - Archetype deck boosts reference **seeded deck ids** (`deck_upkeep`, `deck_self`, `deck_deep`, `deck_fun`). User-created decks don't get boosted by any archetype until decks gain a tag/category field. Energy, context, time-of-day, and short-duration boosts work for any card regardless of deck origin.
 - Archetype weight hook tuning knobs (1.3x–2x) are guesses; no tuning pass.
 - Archetypes from DESIGN.md not yet shipped: Socialite, Caretaker, Gardener, Night Owl/Early Bird, Apprentice. These depend on content that's not modeled yet (social sub-tags, dependent decks, seasonal rhythms, practice decks).
-- Relics, rarity rewards, and commit-draws from the same DESIGN section are still pending — archetypes stand alone for now.
+- Rarity rewards and commit-draws from the same DESIGN section are still pending — archetypes plus relics are the shipped game-mode layer.
+
+## Relics
+
+- Five relics shipped (Early Riser, Steadfast, The Centurion, Deep Diver, Rare Hunter). Catalog lives at `src/domain/relics.ts`. Earn checks run after every completion and every draw.
+- Deck-scoped effects (Centurion → Fun, Deep Diver → Deep clean) reference **seeded deck ids** (`deck_fun`, `deck_deep`). User-created decks can't earn or be boosted by these relics until decks gain a tag/category field — same limitation as archetype deck boosts.
+- All shipped relics are permanent once earned. Weekly / temporary relics from DESIGN.md ("Fun deck weight ×1.5 this week") are a natural extension of the effect model but are deferred.
+- Earn conditions are all *boosts* — no loss states, no punitive relics, preserving "suggestion not coercion."
+- Rare Hunter's `hasEpicCompletion` walks every completion on every earn-check. Fine at POC scale, wants indexing once we move to Dexie.
+- Multiplier tuning (1.2x–1.3x, +1 hand size) is a first pass; no tuning pass yet.
 
 ## Things I did keep honest
 

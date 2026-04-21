@@ -217,7 +217,7 @@ Early rounds of this doc held hard on "reward showing up, not performing." That 
 
 ### Archetypes
 
-An **archetype** is a bundle of draw-weighting tweaks, a starting relic pool (if relics ship), and a bit of flavor. Users pick one (or none) at onboarding; switching is free and non-destructive.
+An **archetype** is a bundle of draw-weighting tweaks, a starting relic pool (if relics ship), and a bit of flavor. Users pick one (or none) at onboarding; switching is free and non-destructive. Archetypes and relics stack — an archetype's weights and any earned relics both apply to every draw.
 
 Illustrative set:
 - **The Hermit.** Self-care and Upkeep weighted; low-energy cards boosted; Fun deck biased toward solo options.
@@ -235,12 +235,29 @@ Archetypes are *weights and flavor*, not restrictions. No content is locked behi
 
 **Initial release ships six of the illustrative archetypes above:** Generalist (no-bias baseline), Hermit, Nester, Explorer, Minimalist, and Recovering. The rest require content shape that isn't modeled yet — social sub-tags, dependent-facing decks, seasonal rhythms, or a user-designated practice deck — and are deferred until those land.
 
+### Relics
+
+**Relics** are passive modifiers the user earns by using the app — streaks, completion milestones, or hitting a specific condition like completing an epic-rarity card. Once earned, a relic is permanent (no expirations, no loss states) and its effect is always on.
+
+Effects are additive bonuses layered on top of the archetype's weights: hand-size deltas and deck/card weight multipliers. Relics only *boost* — they never suppress or remove cards — preserving "suggestion, not coercion." Multiple relics stack (multipliers compound; hand-size deltas sum).
+
+Earn checks run after each completion and after each draw. Conditions that require historical state (like "did any completion cross the epic threshold") walk the existing logs; no extra event tracking is added to the data model.
+
+Initial catalog:
+- **Early Riser** — 3-day streak → +1 hand size on Sundays.
+- **Steadfast** — 10-day streak → +1 hand size always.
+- **The Centurion** — 100 total completions → Fun deck weight ×1.3.
+- **Deep Diver** — 5 Deep-clean completions → Deep-clean weight ×1.3.
+- **Rare Hunter** — complete an epic (≥3× overdue) card → rare+ cards ×1.2.
+
+Temporary / weekly relics (like "Fun deck ×1.5 this week") are a natural extension of the effect model but are deferred until the initial permanent set is tuned.
+
 ### Other mechanics on the table
 
-- **Relics** — passive modifiers earned from streaks or completions (e.g. "+1 hand size on Sunday", "Fun deck weight ×1.5 this week").
 - **Rarity rewards** — completing a very overdue ("epic") card grants a bonus; the fresh/ready/rare/epic tiers get teeth beyond cosmetic framing.
 - **Risk/reward commits** — opt-in "draw 5, commit to 2 by end of day" alongside the no-stakes default draw.
 - **Weekly boss floor** — curated cluster (often Deep clean) with a meaningful completion reward.
+- **Dated cards** - cards that have a specific date or day of the week when they need to be done. Taking the trash cans to the curb, birthday prep, etc.
 
 Modes (including Fun mode) are v1 — they're just saved filter presets and don't require any of the above.
 
@@ -274,3 +291,5 @@ Next round — smaller but real:
 6. **Delete vs. retire.** `Retire` keeps history; `Delete` removes the card entirely. Both.
 7. **Undo window.** After completing, snoozing, or retiring a card, should there be a short "undo" toast? Yes.
 8. **Mini-quest completion window.** Rolling 24h.
+
+
