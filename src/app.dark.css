@@ -1,15 +1,15 @@
 :root {
-  --bg: #fdf6ea;
-  --bg-elev: #ffffff;
-  --bg-elev2: #f5ead4;
-  --text: #2d2418;
-  --text-muted: #7a6a55;
-  --accent: #4a8547;
-  --accent-hot: #d9632c;
+  --bg: #1a1a2e;
+  --bg-elev: #24243e;
+  --bg-elev2: #2e2e4f;
+  --text: #e9e9f4;
+  --text-muted: #a0a0c0;
+  --accent: #9d7fe8;
+  --accent-hot: #e85a8a;
   --accent-ok: #6ddb9c;
-  --border: #e6d9bf;
-  --on-accent: #ffffff;
-  --on-chip: #2d2418;
+  --border: #3a3a5c;
+  --on-accent: #1a1a2e;
+  --on-chip: #1a1a2e;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
   background: var(--bg);

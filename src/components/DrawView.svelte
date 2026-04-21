@@ -154,7 +154,7 @@
   .chip.active {
     background: var(--chip, var(--accent));
     border-color: var(--chip, var(--accent));
-    color: #1a1a2e;
+    color: var(--on-chip);
     font-weight: 600;
   }
   .energy-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
@@ -166,7 +166,7 @@
 
   .flash {
     background: var(--accent-ok);
-    color: #1a1a2e;
+    color: var(--on-chip);
     padding: 0.6rem 0.9rem;
     border-radius: 8px;
     margin-bottom: 1rem;
